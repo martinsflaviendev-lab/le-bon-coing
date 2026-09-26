@@ -1,27 +1,27 @@
 <script setup>
 import { RouterLink, useRouter, useRoute } from 'vue-router'
-import axios from 'axios'
+import { api, setToken, getToken } from '@/api'
 import { ref, inject } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
 
-// STORE
+//-------------------------------------------------- STORE
 const GlobalStore = inject('GlobalStore')
 
-// INPUTS
+//-------------------------------------------------- INPUTS
 const identifier = ref('')
 const password = ref('')
 
-// ERRORS
+//-------------------------------------------------- ERRORS
 const isCorrect = ref(true)
 const isError = ref(false)
 const errorMessage = ref('')
 
-//ASYNCS ALERTS
+//-------------------------------------------------- ASYNCS ALERTS
 const isSubmitting = ref(false)
 
-// RESQUEST
+//-------------------------------------------------- RESQUEST
 const handleSignin = async () => {
   isCorrect.value = true
   isError.value = false
@@ -29,33 +29,27 @@ const handleSignin = async () => {
 
   if (identifier.value && password.value) {
     try {
-      console.log('handling sign up')
+      console.log('handling login')
+      // ------------------------------------ request
+      const response = await api.post('/auth/local', {
+        identifier: identifier.value,
+        password: password.value,
+      })
 
-      const response = await axios.post(
-        'https://site--strapileboncoin--2m8zk47gvydr.code.run/api/auth/local',
-        {
-          identifier: identifier.value,
-          password: password.value,
-        },
-      )
       // Stocking the username and token
-      GlobalStore.userToken.value = response.data.jwt
+      setToken(response.data.jwt)
       GlobalStore.username.value = response.data.user.username
-      GlobalStore.userId.value = response.data.user.id
+
       alert('connexion réussie !')
 
-      // Setting the cookies : username and token ==> DONE
-      $cookies.set('username', response.data.user.username)
-      $cookies.set('userToken', response.data.jwt)
-      $cookies.set('userId', response.data.user.id)
-      //  ‼️en double avec Login View : créer une fonction directement dedans qui fera ça authaumatiquement avec la donnée de la réponse‼️
-
       console.log(response)
+      console.log('the token to compare ====> ', getToken())
 
       router.push(route.query.redirect || { name: 'home' })
     } catch (error) {
       isError.value = true
-      errorMessage.value = error.response.data.error.message
+      errorMessage.value = error.response?.data?.error?.message || 'Une erreur est survenue'
+      console.log(error.response?.data)
     }
   } else {
     isCorrect.value = false

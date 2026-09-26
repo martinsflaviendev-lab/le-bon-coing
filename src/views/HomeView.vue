@@ -1,5 +1,6 @@
 <script setup>
-import axios from 'axios'
+// import axios from 'axios'
+import { api } from '@/api'
 import { inject, onMounted, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import OfferCard from '@/components/OfferCard.vue'
@@ -49,8 +50,6 @@ onMounted(() => {
     const params = {
       'pagination[page]': props.page,
       'pagination[pageSize]': 10,
-      'populate[0]': 'pictures',
-      'populate[1]': 'owner.avatar.data',
       'filters[title][$containsi]': props.search,
       'filters[price][$lte]': props.max,
       'filters[price][$gte]': props.min,
@@ -70,12 +69,10 @@ onMounted(() => {
       //   `https://site--strapileboncoin--2m8zk47gvydr.code.run/api/offers?populate[0]=pictures&populate[1]=owner.avatar.data&filters[title][$containsi]=${props.search}&filters[price][$lte]=${props.max}&filters[price][$gte]=${props.min}${sortingByPrice(props.sort)}`,
       // )
 
-      const { data } = await axios.get(
-        'https://site--strapileboncoin--2m8zk47gvydr.code.run/api/offers',
-        { params },
-      )
+      const { data } = await api.get('/offers', { params })
 
       console.log(data)
+      console.log(JSON.stringify(params))
       offersList.value = data.data
       numberOfPages.value = data.meta.pagination.pageCount
     } catch (err) {

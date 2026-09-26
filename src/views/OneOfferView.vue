@@ -1,22 +1,23 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import axios from 'axios'
+import { api } from '@/api'
 import { useRoute, useRouter } from 'vue-router'
 
+//-------------------------------------------------- ROUTING
 const route = useRoute()
 const router = useRouter()
 
+//-------------------------------------------------- INFOS
 const offerInfo = ref({ data: null })
 
 const props = defineProps({
   id: { required: true },
 })
 
+//-------------------------------------------------- REQUEST
 onMounted(async () => {
   try {
-    const { data } = await axios.get(
-      `https://site--strapileboncoin--2m8zk47gvydr.code.run/api/offers/${props.id}?populate[0]=pictures&populate[1]=owner.avatar.data`,
-    )
+    const { data } = await api.get(`/offers/${props.id}`)
     console.log(data)
     offerInfo.value = data
   } catch (err) {
@@ -24,6 +25,7 @@ onMounted(async () => {
   }
 })
 
+//-------------------------------------------------- DATE FORMATING
 const toGoodDate = (date) => {
   return date
     .match(/([^T]+)/)[0]
@@ -38,25 +40,24 @@ const toGoodDate = (date) => {
     <p>TEST ONE OFFER VIEW</p>
 
     <div class="container">
-      <!-- Offer -->
-
+      <!-- ======================================== OFFER -->
       <div v-if="offerInfo.data" class="offerContainer">
         <div class="imageContainer">
           <img
-            v-for="(el, index) in offerInfo.data.attributes.pictures.data"
-            :key="index"
-            :src="offerInfo.data.attributes.pictures.data[index].attributes.url"
+            v-for="(picture, index) in offerInfo.data.pictures"
+            :key="picture.id"
+            :src="picture.url"
             alt=""
           />
         </div>
 
-        <h3>{{ offerInfo.data.attributes.title }}</h3>
-        <p>{{ offerInfo.data.attributes.price }} €</p>
-        <p>{{ toGoodDate(offerInfo.data.attributes.publishedAt) }}</p>
+        <h3>{{ offerInfo.data.title }}</h3>
+        <p>{{ offerInfo.data.price }} €</p>
+        <p>{{ toGoodDate(offerInfo.data.publishedAt) }}</p>
 
         <div class="description">
           <h2>Description</h2>
-          <p>{{ offerInfo.data.attributes.description }}</p>
+          <p>{{ offerInfo.data.description }}</p>
         </div>
         <p>Agon-coutainville (50230)</p>
       </div>
@@ -64,23 +65,17 @@ const toGoodDate = (date) => {
         <p>Chargement</p>
       </div>
 
-      <!-- Owner -->
+      <!-- ======================================== OWNER -->
       <div v-if="offerInfo.data" class="ownerContainer">
         <div>
           <div class="owner">
-            <img
-              v-if="offerInfo.data.attributes.owner.data.attributes.avatar.data"
-              :src="offerInfo.data.attributes.owner.data.attributes.avatar.data.attributes.url"
-              alt=""
-            />
-            <h2>{{ offerInfo.data.attributes.owner.data.attributes.username }}</h2>
+            <img v-if="offerInfo.data.owner.avatar" :src="offerInfo.data.owner.avatar.url" alt="" />
+            <h2>{{ offerInfo.data.owner.username }}</h2>
           </div>
-          <span v-if="offerInfo.data.attributes.owner.data.attributes.confirmed === true"
-            >Pièce d'identité vérifiée</span
-          >
+          <span v-if="offerInfo.data.owner.confirmed === true">Pièce d'identité vérifiée</span>
           <p>Répond en général en moins d'1 heure</p>
         </div>
-
+        <!-- ======================= BUY -->
         <div class="buttons">
           <button @click="router.push({ name: 'buy', params: { id: props.id } })">Acheter</button>
           <button>Message</button>

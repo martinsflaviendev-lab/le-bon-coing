@@ -1,5 +1,5 @@
 <script setup>
-import axios from 'axios'
+import { api, getToken } from '@/api'
 import { inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -15,8 +15,6 @@ const pictures = ref([])
 // REQUEST REFS  __________________________________________🔎
 const isPublishing = ref(false)
 const errorMessage = ref('')
-const owner = ref(GlobalStore.userId.value)
-// To delete whis The strapi V5
 
 //PICTURES HANDLING  ______________________________________📷
 const handleFilesChange = (event) => {
@@ -57,33 +55,32 @@ const handleSubmit = async () => {
   ) {
     console.log('begining request')
     try {
+      // ------------------------------------ REQUETE UPLOAD
       const formData = new FormData()
       pictures.value.forEach((file) => {
-        formData.append('files.pictures', file)
+        formData.append('files', file)
       })
+      console.log('token before upload: ', getToken())
 
-      const stringifiedInfos = JSON.stringify({
-        title: title.value,
-        description: description.value,
-        price: price.value,
-        owner: owner.value,
-      })
-      formData.append('data', stringifiedInfos)
+      const uploadResponse = await api.post('/upload', formData)
+      console.log(uploadResponse.data)
 
-      const response = await axios.post(
-        'https://site--strapileboncoin--2m8zk47gvydr.code.run/api/offers',
-        formData,
-        {
-          headers: {
-            Authorization: 'Bearer ' + GlobalStore.userToken.value,
-          },
+      const uploadedFileIds = uploadResponse.data.map((file) => file.id)
+
+      // ------------------------------------ REQUETE POST
+      const response = await api.post('/offers', {
+        data: {
+          title: title.value,
+          price: price.value,
+          pictures: uploadedFileIds,
+          description: description.value,
         },
-      )
+      })
 
       console.log('response>>', response.data)
       alert('publication réussie')
 
-      router.push({ name: 'offer', params: { id: response.data.data.id } })
+      router.push({ name: 'offer', params: { id: response.data.data.documentId } })
     } catch (error) {
       console.log(error)
       errorMessage.value = error.response.data

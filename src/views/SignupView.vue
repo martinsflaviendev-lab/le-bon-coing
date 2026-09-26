@@ -1,19 +1,25 @@
 <script setup>
-import axios from 'axios'
+// import axios from 'axios'
+import { api, setToken, getToken } from '@/api'
 import { inject, ref } from 'vue'
 
+//-------------------------------------------------- STORE
 const GlobalStore = inject('GlobalStore')
 
+//-------------------------------------------------- INPUTS
 const email = ref('')
 const username = ref('')
 const password = ref('')
 
+//-------------------------------------------------- ERRORS
 const isCorrect = ref(true)
 const isError = ref(false)
 const errorMessage = ref('')
 
+//-------------------------------------------------- ASYNCS ALERTS
 const isSubmitting = ref(false)
 
+//-------------------------------------------------- RESQUEST
 const handleSignin = async () => {
   isError.value = false
   isSubmitting.value = true
@@ -23,30 +29,27 @@ const handleSignin = async () => {
     try {
       console.log('handling sign up')
 
-      const response = await axios.post(
-        'https://site--strapileboncoin--2m8zk47gvydr.code.run/api/auth/local/register',
-        {
-          email: email.value,
-          username: username.value,
-          password: password.value,
-        },
-      )
+      // --------------------------------------- request
+      const response = await api.post('/auth/local/register', {
+        email: email.value,
+        username: username.value,
+        password: password.value,
+      })
 
-      GlobalStore.userToken.value = response.data.jwt
+      // Stocking the username and token
+      setToken(response.data.jwt)
       GlobalStore.username.value = response.data.user.username
-      // cookies setting --> username and user token NOTDONE
-      $cookies.set('username', response.data.user.username)
-      $cookies.set('userToken', response.data.jwt)
-      //  ‼️en double avec Login View : créer une fonction directement dedans qui fera ça authaumatiquement avec la donnée de la réponse‼️
 
       alert('enregistrement réussi !')
 
-      console.log(response)
+      // ---------------------------------------- debug/test
+      // console.log(response)
+      // console.log('token set: ', getToken())
     } catch (error) {
       console.log(error)
       console.log(error.response.data.error)
       isError.value = true
-      errorMessage.value = error.response.data.error.message
+      errorMessage.value = error.response?.data?.error?.message || 'Une erreur est survenue'
     }
   } else {
     isCorrect.value = false
@@ -78,7 +81,7 @@ const handleSignin = async () => {
 
         <label for="password">Mot de passe* </label>
         <input
-          type="text"
+          type="password"
           name="password"
           id="password"
           placeholder="votre mot de passe"

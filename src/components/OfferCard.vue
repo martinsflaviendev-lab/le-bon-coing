@@ -11,28 +11,26 @@ const toGoodDate = (date) => {
     .reverse()
     .join('/')
 }
+
+console.log(props.offer)
 </script>
 
 <template>
-  <RouterLink :to="{ name: 'offer', params: { id: props.offer.id } }">
+  <RouterLink :to="{ name: 'offer', params: { id: props.offer.documentId } }">
     <div class="cardContainer">
       <div class="author">
-        <img
-          v-if="props.offer.attributes.owner.data.attributes.avatar.data"
-          :src="props.offer.attributes.owner.data.attributes.avatar.data.attributes.url"
-          alt=""
-        />
-        <h3>{{ props.offer.attributes.owner.data.attributes.username }}</h3>
+        <img v-if="props.offer.owner?.avatar" :src="props.offer.owner.avatar.url" alt="" />
+        <h3>{{ props.offer.owner.username }}</h3>
       </div>
       <img
-        v-if="props.offer.attributes.pictures.data"
-        :src="props.offer.attributes.pictures.data[0].attributes.url"
+        v-if="props.offer.pictures?.length"
+        :src="props.offer.pictures[0].url"
         alt=""
         class="offerImage"
       />
-      <p>{{ props.offer.attributes.title }}</p>
-      <h4>{{ props.offer.attributes.price }} €</h4>
-      <h4>{{ toGoodDate(props.offer.attributes.publishedAt) }}</h4>
+      <p>{{ props.offer.title }}</p>
+      <h4>{{ props.offer.price }} €</h4>
+      <h4>{{ toGoodDate(props.offer.publishedAt) }}</h4>
     </div>
   </RouterLink>
 </template>

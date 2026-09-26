@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getToken, restoreSession } from '@/api'
 
 import HomeView from '../views/HomeView.vue'
 import OneOfferView from '../views/OneOfferView.vue'
@@ -64,10 +65,8 @@ const router = createRouter({
   },
 })
 
-router.beforeEach((to, from) => {
-  const GlobalStore = inject('GlobalStore')
-
-  if (to.meta.requiredAuth && !GlobalStore.userToken.value) {
+router.beforeEach(async (to) => {
+  if (to.meta.requiredAuth && !getToken()) {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
 })
