@@ -5,14 +5,14 @@ import App from './App.vue'
 import router from './router'
 import { api, restoreSession, logout as apiLogout } from './api'
 
-const username = ref('null')
+const username = ref(null)
 
 async function starting() {
   const restored = await restoreSession()
 
   if (restored) {
     try {
-      const { data } = await api.get('/user/me')
+      const { data } = await api.get('/users/me')
       username.value = data.username
     } catch {
       username.value = null

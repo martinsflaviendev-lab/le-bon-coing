@@ -10,7 +10,7 @@ const GlobalStore = inject('GlobalStore')
 const searchedWord = ref('')
 
 const deconnectUser = () => {
-  GlobalStore.deleteInfos()
+  GlobalStore.logout()
 }
 
 const handleSearch = () => {

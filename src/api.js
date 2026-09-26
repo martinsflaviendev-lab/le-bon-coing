@@ -16,9 +16,12 @@ let accessToken = null // memory only, never localStorage
 export const setToken = (t) => (accessToken = t)
 export const getToken = () => accessToken
 
+const NO_AUTH_HEADER_ROUTES = ['/auth/local', '/auth/local/register', '/auth/refresh']
+
 api.interceptors.request.use((cfg) => {
-  const isAuthRoute = cfg.url?.startsWith('/auth/')
-  if (accessToken && !isAuthRoute) cfg.headers.Authorization = `Bearer ${accessToken}`
+  const skipAuth = NO_AUTH_HEADER_ROUTES.some((route) => cfg.url?.startsWith(route))
+  // checks if an element (routein paramater) of NO_AUTH.. is included in the start of cfg.url
+  if (accessToken && !skipAuth) cfg.headers.Authorization = `Bearer ${accessToken}`
   return cfg
 })
 
