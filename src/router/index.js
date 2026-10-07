@@ -8,6 +8,7 @@ import LoginView from '../views/LoginView.vue'
 import PublishView from '@/views/PublishView.vue'
 import BuyView from '@/views/BuyView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
+import UserView from '@/views/UserView.vue'
 import { inject } from 'vue'
 
 const router = createRouter({
@@ -52,6 +53,12 @@ const router = createRouter({
       name: 'buy',
       component: BuyView,
       props: true,
+      meta: { requiredAuth: true },
+    },
+    {
+      path: '/user',
+      name: 'user',
+      component: UserView,
       meta: { requiredAuth: true },
     },
     {

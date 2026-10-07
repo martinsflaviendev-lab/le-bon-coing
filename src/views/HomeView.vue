@@ -179,6 +179,8 @@ const previousPage = () => {
       <div class="banner">
         <h2>C'est le momment de vendre</h2>
         <button>Déposer une annonce</button>
+        <img src="../assets/images/onde-corail-4Af4yJVc.svg" alt="" class="first" />
+        <img src="../assets/images/second-flower.svg" alt="" class="second" />
       </div>
 
       <p v-if="offersList.length === 0">chargement</p>
@@ -197,30 +199,49 @@ const previousPage = () => {
 
 <style scoped>
 .container {
+  width: 95%;
   margin: 20px auto;
   display: flex;
   flex-direction: column;
-  width: 1200px;
+  max-width: 1800px;
   justify-content: center;
 }
 
 .offersContainer {
-  display: flex;
-  flex-wrap: wrap;
-  width: 1200px;
-  justify-content: space-between;
-  gap: 30px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: 1fr;
+  column-gap: 20px;
+  row-gap: 50px;
   margin-top: 30px;
+  margin-bottom: 40px;
 }
 
 .banner {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 20px;
+  background-color: #ffe9de;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 20px;
-  height: 35px;
-  background-color: coral;
+  height: 80px;
   padding: 15px 20px;
+}
+
+.banner > .first {
+  position: absolute;
+  left: 0px;
+  height: 100%;
+  z-index: -1;
+}
+.banner > .second {
+  position: absolute;
+  right: 0px;
+  height: 100%;
+  z-index: -1;
 }
 
 .filterBar {
@@ -253,17 +274,15 @@ input[type='number'] {
   appearance: textfield;
 }
 
-@media (max-width: 1200px) {
-  .container,
-  .offersContainer {
+/* @media (max-width: 1400px) {
+  .container {
     width: 900px;
   }
 }
 
 @media (max-width: 1024px) {
-  .container,
-  .offersContainer {
+  .containe {
     width: 800px;
   }
-}
+} */
 </style>

@@ -132,7 +132,7 @@ const handleSubmit = async () => {
       </form>
 
       <!-- Previsualisation -->
-      <div clas="previsualisation" v-if="pictures.length">
+      <div class="previsualisation" v-if="pictures.length">
         <div v-for="(file, index) in pictures" :key="file.name + file.lastModified">
           <h4>{{ file.name }}</h4>
           <img :src="getURL(file)" />
