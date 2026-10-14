@@ -7,7 +7,13 @@
 }
 
 :root {
-  --header-height: 40px;
+  --header-height: 120px;
+  --main-bckg-color: #ec5a13;
+  --hover-main-button-bckg-color: #f07b42;
+  --second-font-family: 'Nunito Sans Variable', sans-serif;
+  --secondary-color: #0f3260;
+  --secondary-color-hover: #005295;
+  --neutral-color: #eeeef5;
 }
 
 body {

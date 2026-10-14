@@ -1,9 +1,11 @@
 import axios from 'axios'
+import { ref } from 'vue'
 
 // If VITE_API_URL is set (Option B: separate subdomains), use it as an
 // absolute base URL and send cookies cross-origin via withCredentials.
 // If it's unset (Option A: Netlify proxy, or local dev via Vite proxy),
 // use a relative "/api" path — same-origin, no withCredentials needed.
+// VITE_API_URL (Option B) doesn’t fit your deployment. With Netlify and Northflank on their default domains, your Strapi cookie is cross-site, so it needs SameSite=None; Secure, and Safari and others may block it. The cookie then also allows cross-site POSTs to /auth/refresh and /auth/logout (low impact, but still CSRF). Option A, the Netlify proxy, avoids all of this, so I’d treat Option B as something to use only if you later get a shared parent domain.
 const remoteBaseUrl = import.meta.env.VITE_API_URL
 
 export const api = axios.create({
@@ -12,8 +14,12 @@ export const api = axios.create({
 })
 
 let accessToken = null // memory only, never localStorage
+export const isLoggedIn = ref(false)
 
-export const setToken = (t) => (accessToken = t)
+export const setToken = (t) => {
+  accessToken = t
+  isLoggedIn.value = !!t
+}
 export const getToken = () => accessToken
 
 const NO_AUTH_HEADER_ROUTES = ['/auth/local', '/auth/local/register', '/auth/refresh']
@@ -58,6 +64,27 @@ export async function restoreSession() {
     return false
   }
 }
+//  UNE MEILLEURE VERSION - A VOIR SI JE FAIS 3 REQUETES SUR UNE MEME PAGE
+// let refreshPromise = null
+
+// export function restoreSession() {
+//   if (!refreshPromise) {
+//     refreshPromise = api
+//       .post('/auth/refresh')
+//       .then(({ data }) => {
+//         setToken(data.jwt)
+//         return true
+//       })
+//       .catch(() => {
+//         setToken(null)
+//         return false
+//       })
+//       .finally(() => {
+//         refreshPromise = null
+//       })
+//   }
+//   return refreshPromise
+// }
 
 export async function logout() {
   try {

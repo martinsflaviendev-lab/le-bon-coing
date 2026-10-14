@@ -2,8 +2,9 @@
 // import axios from 'axios'
 import { api } from '@/api'
 import { inject, onMounted, ref, watchEffect } from 'vue'
-import { useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import OfferCard from '@/components/OfferCard.vue'
+import LoadingAnimation from '@/components/LoadingAnimation.vue'
 
 const router = useRouter()
 
@@ -49,7 +50,7 @@ onMounted(() => {
 
     const params = {
       'pagination[page]': props.page,
-      'pagination[pageSize]': 10,
+      'pagination[pageSize]': 10, // changer pour 15 un fois fini
       'filters[title][$containsi]': props.search,
       'filters[price][$lte]': props.max,
       'filters[price][$gte]': props.min,
@@ -105,34 +106,50 @@ const previousPage = () => {
   queries.page = queries.page - 1
   router.push({ name: 'home', query: queries })
 }
+
+const goToPage = (n) => {
+  const queries = { ...props }
+  queries.page = n
+  router.push({ name: 'home', query: queries })
+}
 </script>
 
 <template>
   <main>
     <div class="container">
+      <!-- ==================================== FILTERS -->
       <form class="filterBar" @submit.prevent="handleFilters">
+        <!-- ==================== Prix -->
         <div class="price">
           <h2>Prix</h2>
           <div>
-            <input
-              type="number"
-              min="0"
-              pattern="[0-9]*"
-              placeholder="Prix min"
-              id="minprice"
-              v-model="minPrice"
-            />
-            <input
-              type="number"
-              min="0"
-              pattern="[0-9]*"
-              placeholder="Prix max"
-              id="maxprice"
-              v-model="maxPrice"
-            />
+            <div class="priceIn">
+              <input
+                type="number"
+                min="0"
+                pattern="[0-9]*"
+                placeholder="Prix min"
+                id="minprice"
+                v-model="minPrice"
+              />
+              <div><p>€</p></div>
+            </div>
+
+            <div class="priceIn">
+              <input
+                type="number"
+                min="0"
+                pattern="[0-9]*"
+                placeholder="Prix max"
+                id="maxprice"
+                v-model="maxPrice"
+              />
+
+              <div><p>€</p></div>
+            </div>
           </div>
         </div>
-
+        <!-- ==================== Tri -->
         <div class="sorting">
           <h2>Tri</h2>
 
@@ -169,28 +186,51 @@ const previousPage = () => {
           </div>
         </div>
 
+        <!-- ==================== Bouton -->
         <button>Rechercher</button>
       </form>
 
-      <p class="annonce">
-        Des millions de petites annonces et autant d'occasions de se faire plaisir
-      </p>
+      <!--  ===================================== ANNONCE -->
+      <div class="annonce">
+        <p>Des millions de petites annonces et autant d'occasions de se faire plaisir</p>
+      </div>
 
+      <!--  ===================================== BANNIERE -->
       <div class="banner">
-        <h2>C'est le momment de vendre</h2>
-        <button>Déposer une annonce</button>
+        <div>
+          <h2>C'est le momment de vendre</h2>
+          <RouterLink :to="{ name: 'publish' }">
+            <button>+ Déposer une annonce</button>
+          </RouterLink>
+        </div>
+
         <img src="../assets/images/onde-corail-4Af4yJVc.svg" alt="" class="first" />
         <img src="../assets/images/second-flower.svg" alt="" class="second" />
       </div>
 
-      <p v-if="offersList.length === 0">chargement</p>
+      <!-- ======================================= Loading animation -->
+      <div class="loading" v-if="offersList.length === 0">
+        <p>Chargement en cours</p>
+        <LoadingAnimation />
+      </div>
 
+      <!--  ===================================== CARDS -->
       <div v-else class="offersContainer">
         <OfferCard v-for="offer in offersList" :key="offer.id" :offer="offer" />
       </div>
 
+      <!--  ===================================== PAGE -->
       <div class="changePages">
         <button v-if="page > 1" @click="previousPage">Page précédente</button>
+        <button
+          class="pageNumber"
+          v-for="n in numberOfPages"
+          :key="n"
+          @click="goToPage(n)"
+          :class="{ selected: n === page }"
+        >
+          {{ n }}
+        </button>
         <button v-if="page < numberOfPages" @click="nextPage">Page suivante</button>
       </div>
     </div>
@@ -244,36 +284,175 @@ const previousPage = () => {
   z-index: -1;
 }
 
+/* ----------------------------------------------- FILTERS */
 .filterBar {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-around;
   margin: 30px 0px;
 }
-
-.price {
-  display: flex;
-  flex-direction: column;
+.filterBar h2 {
+  font-weight: 600;
+  font-size: 20px;
+  margin-bottom: 5px;
 }
 
+.price,
 .sorting {
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
+/* __________________________________Price */
 .price > div {
   display: flex;
   flex-direction: row;
+  gap: 10px;
+}
+
+.priceIn {
+  display: flex;
+  align-items: center;
+  border: 1px solid grey;
+  padding: 5px 10px;
+  border-radius: 30px;
+}
+.priceIn div {
+  border-left: 1px solid grey;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 5px;
 }
 
 input {
-  max-width: 80px;
+  height: 30px;
+  max-width: 100px;
+  border: none;
+  /* color: grey; */
+  /* border: 1px solid grey; */
+}
+input:hover {
+  height: 30px;
+  max-width: 100px;
+  border: none;
+  /* border: 1px solid grey; */
 }
 
 input[type='number'] {
   appearance: textfield;
+  -moz-appearance: textfield;
+}
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
+/* __________________________________ Sorting */
+.buttonsSort {
+  display: flex;
+  gap: 20px;
+}
+.buttonsSort label {
+  display: flex;
+  align-items: center;
+}
+
+form button {
+  background-color: var(--main-bckg-color);
+  width: 150px;
+  height: 50px;
+  transform: translateY(20px);
+  border: 0px;
+  border-radius: 40px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--second-font-family);
+  color: white;
+}
+form button:hover {
+  background-color: var(--hover-main-button-bckg-color);
+}
+
+/* -------------------------------- annonce */
+.annonce {
+  margin: 20px auto;
+  justify-content: center;
+}
+
+/* -------------------------------- banner */
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.banner div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+.banner h2 {
+  font-weight: 650;
+  font-size: 18px;
+}
+.banner button {
+  background-color: var(--main-bckg-color);
+  width: 250px;
+  height: 40px;
+  border: 0px;
+  border-radius: 40px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--second-font-family);
+  color: white;
+}
+
+.banner button:hover {
+  background-color: var(--hover-main-button-bckg-color);
+}
+
+/* --------------------------------loading  */
+
+.loading {
+  margin: auto;
+}
+
+/* -------------------------------- page button */
+
+.changePages {
+  display: flex;
+  justify-content: center;
+}
+.changePages button {
+  background-color: var(--secondary-color);
+  width: 120px;
+  height: 40px;
+  transform: translateY(20px);
+  border: 0px;
+  border-radius: 40px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--second-font-family);
+  color: white;
+}
+.changePages button:hover {
+  background-color: var(--secondary-color-hover);
+}
+
+.changePages .pageNumber {
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  color: black;
+}
+
+.changePages .selected {
+  background-color: var(--secondary-color);
+  color: white;
+}
 /* @media (max-width: 1400px) {
   .container {
     width: 900px;

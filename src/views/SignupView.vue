@@ -1,7 +1,8 @@
 <script setup>
 // import axios from 'axios'
-import { api, setToken, getToken } from '@/api'
+import { api, setToken } from '@/api'
 import { inject, ref } from 'vue'
+import CardAnimation from '@/components/CardAnimation.vue'
 
 //-------------------------------------------------- STORE
 const GlobalStore = inject('GlobalStore')
@@ -63,51 +64,123 @@ const handleSignin = async () => {
 <template>
   <main>
     <div class="loginContainer">
-      <h1>Bonjour</h1>
-      <p>Inscrivez-vous pour découvrir toutes les fonctionalités.</p>
+      <div class="loginForm">
+        <h1>Inscrivez-vous pour découvrir toutes les fonctionalités</h1>
 
-      <form @submit.prevent="handleSignin">
-        <label for="email">E-maill*</label>
-        <input type="text" name="email" id="email" placeholder="votre e-mail" v-model="email" />
+        <div class="formWrapper">
+          <form @submit.prevent="handleSignin">
+            <div>
+              <label for="email">E-maill*</label>
+              <input
+                type="text"
+                name="email"
+                id="email"
+                placeholder="votre e-mail"
+                v-model="email"
+              />
+            </div>
+            <div>
+              <label for="username">Nom*</label>
+              <input
+                type="text"
+                name="username"
+                id="username"
+                placeholder="votre nom d'utilisateur"
+                v-model="username"
+              />
+            </div>
+            <div>
+              <label for="password">Mot de passe* </label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                placeholder="votre mot de passe"
+                v-model="password"
+              />
+            </div>
 
-        <label for="username">Nom*</label>
-        <input
-          type="text"
-          name="username"
-          id="username"
-          placeholder="votre nom d'utilisateur"
-          v-model="username"
-        />
+            <button>S'enregistrer</button>
+          </form>
+        </div>
 
-        <label for="password">Mot de passe* </label>
-        <input
-          type="password"
-          name="password"
-          id="password"
-          placeholder="votre mot de passe"
-          v-model="password"
-        />
-
-        <button>S'enregistrer</button>
-      </form>
-      <p class="warning" v-if="isSubmitting">Enregistrement en cours</p>
-      <p class="warning" v-if="errorMessage">{{ errorMessage }}</p>
-      <p class="warning" v-if="!isCorrect">Veuillz remplir tous les champs obligatoires</p>
+        <p class="warning" v-if="isSubmitting">Enregistrement en cours</p>
+        <p class="warning" v-if="errorMessage">{{ errorMessage }}</p>
+        <p class="warning" v-if="!isCorrect">Veuillz remplir tous les champs obligatoires</p>
+      </div>
     </div>
+    <CardAnimation />
   </main>
 </template>
 
 <style scoped>
+main {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+.loginContainer {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  margin-left: 30px;
+  flex: 1;
+  max-width: 500px;
+}
+
+.loginForm {
+  margin-top: 30px;
+}
+
+.loginForm > h1 {
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.formWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
 form {
+  margin: 20px 0px;
   display: flex;
   flex-direction: column;
   width: 350px;
+  gap: 20px;
+  align-items: center;
+}
+
+form label {
+  font-size: 18px;
 }
 
 input,
 button {
-  width: 300px;
+  margin-top: 5px;
+  height: 50px;
+  width: 380px;
   align-self: center;
+  font-size: 16px;
+}
+
+input {
+  box-sizing: border-box;
+  padding-left: 15px;
+  border: 1px solid grey;
+  border-radius: 35px;
+}
+
+button {
+  border: none;
+  border-radius: 35px;
+  background-color: var(--main-bckg-color);
+  font-weight: 600;
+  color: white;
+}
+button:hover {
+  background-color: var(--hover-main-button-bckg-color);
 }
 
 footer {

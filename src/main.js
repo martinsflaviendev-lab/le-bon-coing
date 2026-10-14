@@ -5,7 +5,7 @@ import './assets/main.css'
 import { createApp, ref } from 'vue'
 import App from './App.vue'
 import router from './router'
-import { api, restoreSession, logout as apiLogout } from './api'
+import { api, restoreSession, logout as apiLogout, getToken, isLoggedIn } from './api'
 
 const username = ref(null)
 
@@ -32,6 +32,7 @@ async function starting() {
   app.provide('GlobalStore', {
     username,
     logout,
+    isLoggedIn,
   })
 
   app.mount('#app')

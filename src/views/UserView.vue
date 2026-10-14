@@ -1,5 +1,6 @@
 <script setup>
 import { api } from '@/api'
+import LoadingAnimation from '@/components/LoadingAnimation.vue'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -8,6 +9,8 @@ const router = useRouter()
 // ------------------------------------------------ REFS/INFOS
 const userOffers = ref({ data: null })
 const userInfos = ref({ data: null })
+const isLoading = ref(true)
+const hasError = ref(false)
 
 // ------------------------------------------------ INFOS REQUEST
 onMounted(async () => {
@@ -21,6 +24,9 @@ onMounted(async () => {
     userOffers.value = offersData
   } catch (error) {
     console.log(error)
+    hasError.value = true
+  } finally {
+    isLoading.value = false
   }
 })
 
@@ -51,7 +57,14 @@ const toGoodDate = (date) => {
 
 <template>
   <main>
-    <div class="wrapper">
+    <div class="loading" v-if="isLoading">
+      <p>Chargement en cours</p>
+      <LoadingAnimation />
+    </div>
+    <div v-else-if="hasError">
+      <p>erreur du chagement</p>
+    </div>
+    <div class="wrapper" v-else>
       <div class="userContainer">
         <div v-if="userInfos">
           <h1>{{ userInfos.username }}</h1>
