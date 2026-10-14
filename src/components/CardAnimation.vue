@@ -35,9 +35,22 @@
 </template>
 
 <style scoped>
+@media (min-height: 900px) {
+  .animationWrapper {
+    height: 800px;
+  }
+}
+.wrapper {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  --h: clamp(400px, 80vh, 900px);
+}
 .animationWrapper {
-  width: 470px;
-  height: 600px;
+  width: 100%;
+  max-width: 800px;
+  max-height: var(--h);
   overflow: hidden;
   display: flex;
   align-items: flex-start;
@@ -46,6 +59,8 @@
 
 .column {
   animation: defile 20s linear infinite;
+  flex: 1;
+  min-width: 0;
 }
 
 .reverse {
@@ -53,8 +68,8 @@
 }
 
 .rectangle {
-  height: 300px;
-  width: 150px;
+  height: calc(var(--h) / 1.5);
+  width: 100%;
   margin-bottom: 10px;
   border-radius: 17px;
 }
@@ -99,6 +114,12 @@
 @media (prefers-reduced-motion: reduce) {
   .column {
     animation: none;
+  }
+}
+
+@media (min-height: 600px) {
+  .animationWrapper {
+    height: 800px;
   }
 }
 </style>
